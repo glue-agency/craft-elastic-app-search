@@ -1,0 +1,156 @@
+{% import '_includes/forms' as forms %}
+{% import 'elastic-app-search/_macros' as macros %}
+
+<h2>{{ 'Connection'|t('elastic-app-search') }}</h2>
+
+{{ forms.autosuggestField({
+    label: 'Endpoint'|t('elastic-app-search'),
+    instructions: 'The Elastic endpoint url.'|t('elastic-app-search'),
+    id: 'endpoint',
+    name: 'endpoint',
+    suggestEnvVars: true,
+    suggestAliases: true,
+    value: settings.endpoint,
+    errors: settings.getErrors('endpoint'),
+    required: true,
+    disabled: macros.configDisable('endpoint'),
+    warning: macros.configWarning('endpoint')
+}) }}
+
+{{ forms.autosuggestField({
+    label: 'Port'|t('elastic-app-search'),
+    id: 'port',
+    name: 'port',
+    suggestEnvVars: true,
+    suggestAliases: true,
+    value: settings.port,
+    placeholder: '9200',
+    errors: settings.getErrors('port'),
+    disabled: macros.configDisable('port'),
+    warning: macros.configWarning('port')
+}) }}
+
+<h2>{{ 'Authentication'|t('elastic-app-search') }}</h2>
+
+{{ forms.selectField({
+    label: 'Type'|t('elastic-app-search'),
+    id: 'auth',
+    name: 'auth',
+    options: [
+        {
+            label: 'Basic'|t('elastic-app-search'),
+            value: 'basic'
+        },
+        {
+            label: 'Token'|t('elastic-app-search'),
+            value: 'token'
+        },
+        {
+            label: 'API Key'|t('elastic-app-search'),
+            value: 'apiKey'
+        }
+    ],
+    value: settings.auth,
+    errors: settings.getErrors('auth'),
+    required: true,
+    disabled: macros.configDisable('auth'),
+    warning: macros.configWarning('auth')
+}) }}
+
+<div id="elastic-app-search-auth-type">
+    {% include "elastic-app-search/settings/auth/#{settings.auth}" %}
+</div>
+
+<h2>{{ 'Search'|t('elastic-app-search') }}</h2>
+
+{{ forms.autosuggestField({
+    label: 'Search Key'|t('elastic-app-search'),
+    id: 'searchKey',
+    name: 'searchKey',
+    suggestEnvVars: true,
+    suggestAliases: true,
+    value: settings.searchKey,
+    errors: settings.getErrors('searchKey'),
+    required: true,
+    disabled: macros.configDisable('searchKey'),
+    warning: macros.configWarning('searchKey')
+}) }}
+
+<hr />
+
+<h2>{{ 'Indexable Sites'|t('elastic-app-search') }}</h2>
+
+<table id="elastic-app-search-indexable-sites" class="editable fullwidth">
+    <tr>
+        <th>
+            {{ forms.checkboxField({
+                id: 'toggle-all-sites',
+                small: true,
+                disabled: macros.configDisable('sites')
+            }) }}
+        </th>
+        <th>{{ 'Name'|t('elastic-app-search') }}</th>
+        <th>{{ 'Index Name'|t('elastic-app-search') }}</th>
+    </tr>
+    {% for site in sites %}
+        <tr>
+            <td class="thin action">
+                {{ forms.checkboxField({
+                    id: "site-#{site.handle}-enabled",
+                    name: "sites[#{site.handle}][enabled]",
+                    checked: settings.sites[site.handle] ? settings.sites[site.handle].enabled : false,
+                    disabled: macros.configDisable('sites')
+                }) }}
+            </td>
+            <td class="leftalign">{{ site.name }}</td>
+            <td class="leftalign singleline-cell textual has-info code">
+                {{ forms.textField({
+                    id: "site-index-#{site.handle}",
+                    name: "sites[#{site.handle}][index]",
+                    value: settings.sites[site.handle] ? settings.sites[site.handle].index : '',
+                    placeholder: "#{systemName} #{craft.app.env} #{site.language}"|kebab,
+                    errors: settings.getErrors('sites'),
+                    disabled: macros.configDisable('sites')
+                }) }}
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
+{% if macros.configDisable('sites') %}
+    <p id="settings-sites-warning" class="warning has-icon">
+        <span class="icon" aria-hidden="true"></span>
+        <span class="visually-hidden">{{ 'Warning:'|t('app') }} </span>
+        <span>{{ macros.configWarning('sites') }}</span>
+    </p>
+{% endif %}
+
+<hr />
+
+<h2>{{ 'Indexable Entries'|t('elastic-app-search') }}</h2>
+
+<table id="elastic-app-search-indexable-entries" class="editable fullwidth">
+    <tr>
+        <th>
+            {{ forms.checkboxField({
+                id: 'toggle-all-entries',
+                small: true,
+                disabled: macros.configDisable('entryHandles')
+            }) }}
+        </th>
+        <th>{{ 'Name'|t('elastic-app-search') }}</th>
+    </tr>
+    {% for entryType in entryTypes %}
+        <tr>
+            <td class="thin action">
+                {{ forms.checkboxField({
+                    id: "entryType-#{entryType.handle}",
+                    name: "entryHandles[#{entryType.handle}]",
+                    checked: entryType.handle in settings.entryHandles,
+                    disabled: macros.configDisable('entryHandles')
+                }) }}
+            </td>
+            <td class="leftalign">{{ entryType.name }}</td>
+        </tr>
+    {% endfor %}
+</table>

@@ -1,0 +1,15 @@
+{% import '_includes/forms' as forms %}
+{% import 'elastic-app-search/_macros' as macros %}
+
+{{ forms.autosuggestField({
+    label: 'Token'|t('elastic-app-search'),
+    id: 'token',
+    name: 'token',
+    suggestEnvVars: true,
+    suggestAliases: true,
+    value: settings.token,
+    errors: settings.getErrors('token'),
+    required: true,
+    disabled: macros.configDisable('token'),
+    warning: macros.configWarning('token')
+}) }}

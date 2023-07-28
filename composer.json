@@ -1,0 +1,35 @@
+{
+    "name": "glue-agency/craft-elastic-app-search",
+    "description": "Index Craft Entries to Elastic App Search",
+    "type": "craft-plugin",
+    "license": "mit",
+    "require": {
+        "php": ">=8.0.2",
+        "craftcms/cms": "^4.0.0",
+        "elastic/enterprise-search": "^8.0",
+        "guzzlehttp/guzzle": "^7.2.0",
+        "insolita/yii2-array-structure-validator": "^2.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "GlueAgency\\ElasticAppSearch\\": "src/"
+        }
+    },
+    "extra": {
+        "handle": "elastic-app-search",
+        "name": "Elastic App Search",
+        "developer": "Glue Agency",
+        "documentationUrl": "",
+        "class": "GlueAgency\\ElasticAppSearch\\ElasticAppSearch"
+    },
+    "config": {
+        "sort-packages": true,
+        "platform": {
+            "php": "8.0.2"
+        },
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true,
+            "craftcms/plugin-installer": true
+        }
+    }
+}

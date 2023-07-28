@@ -1,0 +1,62 @@
+{% import '_includes/forms' as forms %}
+
+<div>
+    <h1>{{ 'Reindex to Elastic App Search'|t('elastic-app-search') }}</h1>
+
+    <form id="elastic-app-search-reindex" class="utility" method="post" accept-charset="UTF-8">
+        {{ actionInput('elastic-app-search/utilities/reindex') }}
+        {{ csrfInput() }}
+
+        {{ forms.checkboxSelectField({
+            label: 'Entry Types'|t('app'),
+            instructions: 'Select all Entry Types that should be reindexed.'|t('elastic-app-search'),
+            id: 'entryHandles',
+            name: 'entryHandles',
+            options: entryTypes|map(entryType => {
+                label: entryType.name,
+                value: entryType.handle,
+                disabled: entryType.handle not in entryHandles
+            }),
+            showAllOption: true,
+        }) }}
+
+        <div class="buttons">
+            {{ forms.submitButton({
+                id: 'reindex',
+                label: 'Reindex'|t('elastic-app-search')
+            }) }}
+        </div>
+    </form>
+</div>
+
+<hr />
+
+<div>
+    <h2>{{ 'Clear all data from Elastic App Search'|t('elastic-app-search') }}</h2>
+
+    <form id="elastic-app-search-clear" class="utility" method="post" accept-charset="UTF-8">
+        {{ actionInput('elastic-app-search/utilities/clear') }}
+        {{ csrfInput() }}
+
+        {{ forms.submitButton({
+            id: 'clear',
+            label: 'Clear all indexed data'|t('elastic-app-search')
+        }) }}
+    </form>
+</div>
+
+<hr />
+
+<div>
+    <h2>{{ 'Engines' }}</h2>
+
+    <form id="elastic-app-search-engines" class="utility" method="post" accept-charset="UTF-8">
+        {{ actionInput('elastic-app-search/utilities/create-engines') }}
+        {{ csrfInput() }}
+
+        {{ forms.submitButton({
+            id: 'createEngines',
+            label: 'Create engines'|t('elastic-app-search')
+        }) }}
+    </form>
+</div>
