@@ -3,6 +3,7 @@
 namespace GlueAgency\ElasticAppSearch\formatters;
 
 use craft\elements\Entry;
+use craft\helpers\StringHelper;
 use GlueAgency\ElasticAppSearch\factories\FieldFormatterFactory;
 
 class EntryElementFormatter implements ElementFormatterInterface
@@ -31,7 +32,8 @@ class EntryElementFormatter implements ElementFormatterInterface
 
         $fieldFormatterFactory = new FieldFormatterFactory;
         foreach($searchableCustomFields as $field) {
-            $data[$field->handle] = $fieldFormatterFactory->format($entry, $field);
+            $handle = StringHelper::toSnakeCase($field->handle);
+            $data[$handle] = $fieldFormatterFactory->format($entry, $field);
         }
 
         return $data;

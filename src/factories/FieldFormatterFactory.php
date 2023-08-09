@@ -5,9 +5,11 @@ namespace GlueAgency\ElasticAppSearch\factories;
 use craft\base\Element;
 use craft\base\Field;
 use craft\fields\Assets as AssetsField;
+use craft\fields\Date as DateField;
 use craft\fields\Entries as EntriesField;
 use craft\fields\Matrix as MatrixField;
 use GlueAgency\ElasticAppSearch\formatters\fields\AssetsFieldFormatter;
+use GlueAgency\ElasticAppSearch\formatters\fields\DateFieldFormatter;
 use GlueAgency\ElasticAppSearch\formatters\fields\EntriesFieldFormatter;
 use GlueAgency\ElasticAppSearch\formatters\fields\MatrixFieldFormatter;
 use GlueAgency\ElasticAppSearch\formatters\fields\SuperTableFieldFormatter;
@@ -21,6 +23,7 @@ class FieldFormatterFactory
         AssetsField::class     => AssetsFieldFormatter::class,
         MatrixField::class     => MatrixFieldFormatter::class,
         SuperTableField::class => SuperTableFieldFormatter::class,
+        DateField::class       => DateFieldFormatter::class,
     ];
 
     public function format(Element $element, Field $field): mixed
