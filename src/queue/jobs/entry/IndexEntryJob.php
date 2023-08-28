@@ -19,6 +19,7 @@ class IndexEntryJob extends BaseJob
         $entry = Entry::find()
             ->id($this->entryId)
             ->siteId($this->siteId)
+            ->status(null)
             ->one();
         $site = Craft::$app->sites
             ->getSiteById($this->siteId);
