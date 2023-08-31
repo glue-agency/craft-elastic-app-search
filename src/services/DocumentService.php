@@ -8,14 +8,16 @@ use Elastic\EnterpriseSearch\AppSearch\Request\GetDocuments;
 use Elastic\EnterpriseSearch\AppSearch\Request\IndexDocuments;
 use Elastic\EnterpriseSearch\AppSearch\Request\ListDocuments;
 use Elastic\EnterpriseSearch\AppSearch\Request\Search;
+use Elastic\EnterpriseSearch\AppSearch\Schema\PaginationResponseObject;
 use Elastic\EnterpriseSearch\AppSearch\Schema\SearchRequestParams;
 use Elastic\EnterpriseSearch\Client;
 use GlueAgency\ElasticAppSearch\ElasticAppSearch;
-use GlueAgency\ElasticAppSearch\formatters\EntryElementFormatter;
 use GlueAgency\ElasticAppSearch\helpers\EngineHelper;
+use GlueAgency\ElasticAppSearch\mappers\elements\EntryMapper;
 use GlueAgency\ElasticAppSearch\presenters\DocumentPresenter;
 use GlueAgency\ElasticAppSearch\presenters\EnginePresenter;
 use GlueAgency\ElasticAppSearch\presenters\PaginatedDocumentsPresenter;
+use GlueAgency\ElasticAppSearch\presenters\search\SearchPresenter;
 use yii\base\Arrayable;
 use yii\base\Component;
 
@@ -40,17 +42,21 @@ class DocumentService extends Component
         return new PaginatedDocumentsPresenter($data);
     }
 
-    public function search(string|EnginePresenter $engine, $query)
+    public function count(string|EnginePresenter $engine) : int
     {
+        $searchQuery = new SearchRequestParams('');
+        $searchQuery->page = new PaginationResponseObject;
+        $searchQuery->page->size = 0;
+
         $data = $this->client->appSearch()
             ->search(
-                new Search(EngineHelper::asString($engine), new SearchRequestParams($query))
+                new Search(EngineHelper::asString($engine), $searchQuery)
             )
             ->asArray();
 
-        dd($data);
+        $search = new SearchPresenter($data);
 
-        return new PaginatedDocumentsPresenter($data);
+        return $search->meta->page->total_results;
     }
 
     public function findById(string|EnginePresenter $engine, int $id): ?DocumentPresenter
@@ -111,7 +117,7 @@ class DocumentService extends Component
         // Process the data through their
         // respective formatter
         if($data instanceof Entry) {
-            return EntryElementFormatter::format($data);
+            return EntryMapper::format($data);
         }
 
         if($data instanceof Arrayable) {

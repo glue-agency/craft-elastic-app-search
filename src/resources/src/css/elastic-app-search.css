@@ -1,0 +1,25 @@
+.eas-pill {
+    background-color: transparent;
+    border-radius: 9999px;
+    padding: 5px 12px;
+}
+
+.eas-pill.eas-pill-info {
+    background-color: rgb(239, 250, 253);
+    color: rgb(63, 117, 161);
+}
+
+.eas-pill.eas-pill-success {
+    background-color: rgb(240, 250, 242);
+    color: rgb(56, 105, 83);
+}
+
+.eas-pill.eas-pill-warning {
+    background-color: rgb(255, 249, 234);
+    color: rgb(187, 142, 40);
+}
+
+.eas-pill.eas-pill-error {
+    background-color: rgb(253, 242, 244);
+    color: rgb(204, 27, 57);
+}

@@ -12,8 +12,12 @@ class ElasticAppSearchAsset extends AssetBundle
     {
         $this->sourcePath = '@elastic-app-search/resources/src/';
 
-        $this->js = [
-            'js/app-search.js',
+        $this->depends = [
+            CpAsset::class,
+        ];
+
+        $this->css = [
+            'css/elastic-app-search.css',
         ];
 
         parent::init();

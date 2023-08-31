@@ -8,22 +8,22 @@ use craft\fields\Assets as AssetsField;
 use craft\fields\Date as DateField;
 use craft\fields\Entries as EntriesField;
 use craft\fields\Matrix as MatrixField;
-use GlueAgency\ElasticAppSearch\formatters\fields\AssetsFieldFormatter;
-use GlueAgency\ElasticAppSearch\formatters\fields\DateFieldFormatter;
-use GlueAgency\ElasticAppSearch\formatters\fields\EntriesFieldFormatter;
-use GlueAgency\ElasticAppSearch\formatters\fields\MatrixFieldFormatter;
-use GlueAgency\ElasticAppSearch\formatters\fields\SuperTableFieldFormatter;
+use GlueAgency\ElasticAppSearch\mappers\elements\fields\AssetsFieldMapper;
+use GlueAgency\ElasticAppSearch\mappers\elements\fields\DateFieldMapper;
+use GlueAgency\ElasticAppSearch\mappers\elements\fields\EntriesFieldMapper;
+use GlueAgency\ElasticAppSearch\mappers\elements\fields\MatrixFieldMapper;
+use GlueAgency\ElasticAppSearch\mappers\elements\fields\SuperTableFieldMapper;
 use verbb\supertable\fields\SuperTableField;
 
-class FieldFormatterFactory
+class FieldMappingFactory
 {
 
     protected array $mappings = [
-        EntriesField::class    => EntriesFieldFormatter::class,
-        AssetsField::class     => AssetsFieldFormatter::class,
-        MatrixField::class     => MatrixFieldFormatter::class,
-        SuperTableField::class => SuperTableFieldFormatter::class,
-        DateField::class       => DateFieldFormatter::class,
+        EntriesField::class    => EntriesFieldMapper::class,
+        AssetsField::class     => AssetsFieldMapper::class,
+        MatrixField::class     => MatrixFieldMapper::class,
+        SuperTableField::class => SuperTableFieldMapper::class,
+        DateField::class       => DateFieldMapper::class,
     ];
 
     public function format(Element $element, Field $field): mixed

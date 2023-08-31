@@ -10,55 +10,103 @@ use GlueAgency\ElasticAppSearch\ElasticAppSearch;
 use GlueAgency\ElasticAppSearch\queue\jobs\settings\CreateEnginesJob;
 use GlueAgency\ElasticAppSearch\queue\jobs\utility\IndexEntryTypesJob;
 use GlueAgency\ElasticAppSearch\queue\jobs\utility\RemoveAllEntriesJob;
+use GlueAgency\ElasticAppSearch\queue\jobs\utility\UpdateSchemaJob;
 use yii\web\Response;
 
 class UtilitiesController extends Controller
 {
 
-    public function actionReindex(): Response
+    public function actionIndex(): Response
     {
         $this->requirePostRequest();
-        $selected = Craft::$app->getRequest()->getBodyParam('entryHandles');
+        $index = Craft::$app->getRequest()->getBodyParam('index');
+        $siteHandle = Craft::$app->getRequest()->getBodyParam('siteHandle');
 
-        if($selected === '*') {
-            $toIndex = ElasticAppSearch::getInstance()->settings->entryHandles;
-        }
+        $site = Craft::$app->sites->getSiteByHandle($siteHandle);
+        Queue::push(new IndexEntryTypesJob([
+            'entryHandles' => ElasticAppSearch::getInstance()->settings->entryHandles,
+            'siteId' => $site->id,
+        ]));
 
-        if(is_array($selected)) {
-            $toIndex = array_filter($selected, function($item) {
-                return in_array($item, ElasticAppSearch::getInstance()->settings->entryHandles);
-            });
-        }
-
-        if(! isset($toIndex) || empty($toIndex)) {
-            Craft::$app->getSession()->setError(Craft::t('elastic-app-search', 'No Entry Types selected.'));
-        } else {
-            foreach(ElasticAppSearch::getInstance()->settings->sites as $handle => $indexName) {
-                $site = Craft::$app->sites->getSiteByHandle($handle);
-
-                Queue::push(new IndexEntryTypesJob([
-                    'entryHandles' => $toIndex,
-                    'siteId'       => $site->id,
-                ]));
-            }
-
-            Craft::$app->getSession()->setSuccess(Craft::t('elastic-app-search', 'Indexing started.'));
-        }
+        Craft::$app->getSession()->setSuccess(Craft::t('elastic-app-search', "Reindexing '{$index}'."));
 
         return $this->redirect(UrlHelper::cpUrl('utilities/elastic-app-search'));
     }
 
-    public function actionClear(): Response
+    public function actionRefresh(): Response
     {
-        foreach(ElasticAppSearch::getInstance()->getSettings()->sites as $handle => $indexName) {
-            $site = Craft::$app->sites->getSiteByHandle($handle);
+        $this->requirePostRequest();
+        $index = Craft::$app->getRequest()->getBodyParam('index');
+        $siteHandle = Craft::$app->getRequest()->getBodyParam('siteHandle');
 
-            Queue::push(new RemoveAllEntriesJob([
-                'siteId' => $site->id,
-            ]));
-        }
+        $site = Craft::$app->sites->getSiteByHandle($siteHandle);
+        Queue::push(new RemoveAllEntriesJob([
+            'siteId' => $site->id,
+        ]));
+        Queue::push(new IndexEntryTypesJob([
+            'entryHandles' => ElasticAppSearch::getInstance()->settings->entryHandles,
+            'siteId' => $site->id,
+        ]));
 
-        Craft::$app->getSession()->setSuccess(Craft::t('elastic-app-search', 'Removal started.'));
+        Craft::$app->getSession()->setSuccess(Craft::t('elastic-app-search', "Refreshing index {$index}."));
+
+        return $this->redirect(UrlHelper::cpUrl('utilities/elastic-app-search'));
+    }
+
+    public function actionSchema(): Response
+    {
+        $this->requirePostRequest();
+        $index = Craft::$app->getRequest()->getBodyParam('index');
+        $siteHandle = Craft::$app->getRequest()->getBodyParam('siteHandle');
+
+        $site = Craft::$app->sites->getSiteByHandle($siteHandle);
+        Queue::push(new UpdateSchemaJob([
+            'siteId' => $site->id,
+        ]));
+
+        Craft::$app->getSession()->setSuccess(Craft::t('elastic-app-search', "Updating Schema index {$index}."));
+
+        return $this->redirect(UrlHelper::cpUrl('utilities/elastic-app-search'));
+    }
+
+    public function actionFlush(): Response
+    {
+        $this->requirePostRequest();
+        $index = Craft::$app->getRequest()->getBodyParam('index');
+        $siteHandle = Craft::$app->getRequest()->getBodyParam('siteHandle');
+
+        $site = Craft::$app->sites->getSiteByHandle($siteHandle);
+        Queue::push(new RemoveAllEntriesJob([
+            'siteId' => $site->id,
+        ]));
+
+        Craft::$app->getSession()->setSuccess(Craft::t('elastic-app-search', "Flushing index {$index}."));
+
+        return $this->redirect(UrlHelper::cpUrl('utilities/elastic-app-search'));
+    }
+
+    public function actionDelete(): Response
+    {
+        $this->requirePostRequest();
+        $index = Craft::$app->getRequest()->getBodyParam('index');
+        $siteHandle = Craft::$app->getRequest()->getBodyParam('siteHandle');
+
+        ElasticAppSearch::getInstance()->engines->delete($index);
+
+        Craft::$app->getSession()->setSuccess(Craft::t('elastic-app-search', "Deleting index '{$index}'."));
+
+        return $this->redirect(UrlHelper::cpUrl('utilities/elastic-app-search'));
+    }
+
+    public function actionCreate(): Response
+    {
+        $this->requirePostRequest();
+        $index = Craft::$app->getRequest()->getBodyParam('index');
+        $siteHandle = Craft::$app->getRequest()->getBodyParam('siteHandle');
+
+        ElasticAppSearch::getInstance()->engines->create($index);
+
+        Craft::$app->getSession()->setSuccess(Craft::t('elastic-app-search', "Creating index '{$index}'."));
 
         return $this->redirect(UrlHelper::cpUrl('utilities/elastic-app-search'));
     }

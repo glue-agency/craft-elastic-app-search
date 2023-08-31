@@ -4,7 +4,7 @@ namespace GlueAgency\ElasticAppSearch\presenters;
 
 use craft\helpers\StringHelper;
 
-abstract class BasePresenter
+abstract class BasePresenter implements Presenter
 {
 
     public function __construct($attributes)

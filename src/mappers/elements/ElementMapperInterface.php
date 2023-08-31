@@ -1,10 +1,10 @@
 <?php
 
-namespace GlueAgency\ElasticAppSearch\formatters;
+namespace GlueAgency\ElasticAppSearch\mappers\elements;
 
 use craft\elements\Entry;
 
-interface ElementFormatterInterface
+interface ElementMapperInterface
 {
 
     public static function format(Entry $entry): mixed;

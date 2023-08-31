@@ -10,7 +10,6 @@ use craft\elements\Entry;
 use craft\events\ModelEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterTemplateRootsEvent;
-use craft\events\RegisterUrlRulesEvent;
 use craft\helpers\Json;
 use craft\helpers\Queue;
 use craft\services\Utilities;
@@ -19,13 +18,13 @@ use craft\web\UrlManager;
 use craft\web\View;
 use GlueAgency\ElasticAppSearch\assetbundles\ElasticAppSearchAsset;
 use GlueAgency\ElasticAppSearch\assetbundles\SettingsAsset;
-use GlueAgency\ElasticAppSearch\helpers\EngineHelper;
 use GlueAgency\ElasticAppSearch\models\Settings;
 use GlueAgency\ElasticAppSearch\queue\jobs\settings\CreateEnginesJob;
 use GlueAgency\ElasticAppSearch\services\ClientService;
 use GlueAgency\ElasticAppSearch\services\DocumentService;
 use GlueAgency\ElasticAppSearch\services\EngineService;
 use GlueAgency\ElasticAppSearch\services\IndexingService;
+use GlueAgency\ElasticAppSearch\services\SchemaService;
 use GlueAgency\ElasticAppSearch\services\SearchService;
 use GlueAgency\ElasticAppSearch\utilities\ElasticAppSearchUtility;
 use GlueAgency\ElasticAppSearch\variables\ElasticAppSearchVariable;
@@ -44,6 +43,7 @@ use yii\base\Event;
  * @property EngineService $engines
  * @property IndexingService $indexing
  * @property SearchService $search
+ * @property SchemaService $schema
  *
  * @author Glue Agency
  * @copyright Glue Agency
@@ -62,8 +62,9 @@ class ElasticAppSearch extends Plugin
                 'client'    => ClientService::class,
                 'documents' => DocumentService::class,
                 'engines'   => EngineService::class,
-                'indexing' => IndexingService::class,
+                'indexing'  => IndexingService::class,
                 'search'    => SearchService::class,
+                'schema'    => SchemaService::class,
             ],
         ];
     }
@@ -73,6 +74,10 @@ class ElasticAppSearch extends Plugin
         Craft::setAlias('@elastic-app-search', $this->getBasePath());
 
         parent::init();
+
+        $this->registerCraftVariable();
+
+        $this->registerCpAsset();
 
         // Defer most setup tasks until Craft is fully initialized
         Craft::$app->onInit(function() {
@@ -156,6 +161,20 @@ class ElasticAppSearch extends Plugin
         $this->controllerNamespace = 'GlueAgency\\ElasticAppSearch\\controllers';
     }
 
+    protected function registerCraftVariable(): void
+    {
+        Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function (Event $event) {
+            $event->sender->set('elasticAppSearch', ElasticAppSearchVariable::class);
+        });
+    }
+
+    protected function registerCpAsset(): void
+    {
+        if(Craft::$app->getRequest()->getIsCpRequest()) {
+            Craft::$app->getView()->registerAssetBundle(ElasticAppSearchAsset::class);
+        }
+    }
+
     protected function attachEventHandlers(): void
     {
         Event::on(View::class, View::EVENT_REGISTER_CP_TEMPLATE_ROOTS, function(RegisterTemplateRootsEvent $event) {
@@ -172,10 +191,6 @@ class ElasticAppSearch extends Plugin
 
         Event::on(Entry::class, Element::EVENT_AFTER_DELETE, function(Event $event) {
             ElasticAppSearch::getInstance()->indexing->delete($event->sender);
-        });
-
-        Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function (Event $event) {
-            $event->sender->set('elasticAppSearch', ElasticAppSearchVariable::class);
         });
     }
 }

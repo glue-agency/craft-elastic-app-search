@@ -2,12 +2,14 @@
 
 namespace GlueAgency\ElasticAppSearch\models;
 
+use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
 use craft\elements\Entry;
 use craft\helpers\App;
 use craft\helpers\ElementHelper;
 use craft\models\Site;
+use craft\web\twig\nodes\RequireGuestNode;
 use insolita\ArrayStructureValidator\ArrayStructureValidator;
 
 class Settings extends Model
@@ -89,6 +91,21 @@ class Settings extends Model
     public function getIndexNameBySiteHandle(string $handle): ?string
     {
         return $this->sites[$handle]['index'] ?? null;
+    }
+
+    public function getSiteByIndexName(string $index): ?Site
+    {
+        $matches = array_filter($this->sites, function($site) use ($index) {
+            return $site['enabled'] && $site['index'] == $index;
+        });
+
+        if(empty($matches)) {
+            return null;
+        }
+
+        $siteHandle = array_key_first($matches);
+
+        return Craft::$app->sites->getSiteByHandle($siteHandle);
     }
 
     public function defineRules(): array

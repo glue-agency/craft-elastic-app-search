@@ -28,8 +28,9 @@ class IndexEntryTypesJob extends BaseJob
         $engineName = ElasticAppSearch::getInstance()->getSettings()->getIndexNameBySite($site);
         $entryQuery = Entry::find()
             ->site($site)
-            ->status(Element::STATUS_ENABLED)
-            ->type($this->entryHandles);
+            ->status(null)
+            ->type($this->entryHandles)
+            ->orderby('id');
         $entryCount = $entryQuery->count();
 
         while($data = $entryQuery->offset($this->offset)->limit($this->batchSize)->all()) {

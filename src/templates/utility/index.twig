@@ -1,62 +1,119 @@
 {% import '_includes/forms' as forms %}
 
-<div>
-    <h1>{{ 'Reindex to Elastic App Search'|t('elastic-app-search') }}</h1>
+<h1>{{ 'Engines'|t('elastic-app-search') }}</h1>
 
-    <form id="elastic-app-search-reindex" class="utility" method="post" accept-charset="UTF-8">
-        {{ actionInput('elastic-app-search/utilities/reindex') }}
-        {{ csrfInput() }}
+<table class="data fullwidth">
+    <thead>
+        <tr>
+            <th>{{ 'Engine name'|t('elastic-app-search') }}</th>
+            <th>{{ 'Status'|t('elastic-app-search') }}</th>
+            <th>{{ 'Craft Entries'|t('elastic-app-search') }}</th>
+            <th>{{ 'App Search Documents'|t('elastic-app-search') }}</th>
+            <th>{{ 'Actions'|t('elastic-app-search') }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for handle, site in sites %}
+            {% set entriesCount = craft.entries
+                .site(handle)
+                .type(entryHandles)
+                .status(null)
+                .count() %}
+            {% set elasticExists = craft.elasticAppSearch.exists(site.index) %}
+            {% set elasticCount = elasticExists ? craft.elasticAppSearch.count(site.index) : 0 %}
+            <tr>
+                <th>{{ site.index }}</th>
+                <td>
+                    {% if not elasticExists %}
+                        <span class="eas-pill eas-pill-error">{{ 'missing'|t('elastic-app-search') }}</span>
+                    {% elseif elasticCount == 0 %}
+                        <span class="eas-pill eas-pill-error">{{ 'empty'|t('elastic-app-search') }}</span>
+                    {% elseif elasticCount == entriesCount %}
+                        <span class="eas-pill eas-pill-success">{{ 'in sync'|t('elastic-app-search') }}</span>
+                    {% else %}
+                        <span class="eas-pill eas-pill-error">{{ 'out of sync'|t('elastic-app-search') }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ entriesCount }}</td>
+                <td>{{ elasticCount }}</td>
+                <td>
+                    <div style="display: flex; gap: 6px">
+                        {% if not elasticExists %}
+                            <form method="post" accept-charset="UTF-8">
+                                {{ actionInput('elastic-app-search/utilities/create') }}
+                                {{ hiddenInput('index', site.index) }}
+                                {{ hiddenInput('siteHandle', handle) }}
+                                {{ csrfInput() }}
 
-        {{ forms.checkboxSelectField({
-            label: 'Entry Types'|t('app'),
-            instructions: 'Select all Entry Types that should be reindexed.'|t('elastic-app-search'),
-            id: 'entryHandles',
-            name: 'entryHandles',
-            options: entryTypes|map(entryType => {
-                label: entryType.name,
-                value: entryType.handle,
-                disabled: entryType.handle not in entryHandles
-            }),
-            showAllOption: true,
-        }) }}
+                                {{ forms.button({
+                                    label: 'Create'|t('elastic-app-search'),
+                                    type: 'submit',
+                                    class: 'submit'
+                                }) }}
+                            </form>
+                        {% else %}
+                            <form method="post" accept-charset="UTF-8">
+                                {{ actionInput('elastic-app-search/utilities/index') }}
+                                {{ hiddenInput('index', site.index) }}
+                                {{ hiddenInput('siteHandle', handle) }}
+                                {{ csrfInput() }}
 
-        <div class="buttons">
-            {{ forms.submitButton({
-                id: 'reindex',
-                label: 'Reindex'|t('elastic-app-search')
-            }) }}
-        </div>
-    </form>
-</div>
+                                {{ forms.button({
+                                    label: 'Index'|t('elastic-app-search'),
+                                    type: 'submit',
+                                    class: 'submit'
+                                }) }}
+                            </form>
+                            <form method="post" accept-charset="UTF-8">
+                                {{ actionInput('elastic-app-search/utilities/refresh') }}
+                                {{ hiddenInput('index', site.index) }}
+                                {{ hiddenInput('siteHandle', handle) }}
+                                {{ csrfInput() }}
 
-<hr />
+                                {{ forms.button({
+                                    label: 'Refresh'|t('elastic-app-search'),
+                                    type: 'submit',
+                                    class: 'submit'
+                                }) }}
+                            </form>
+                            <form method="post" accept-charset="UTF-8">
+                                {{ actionInput('elastic-app-search/utilities/schema') }}
+                                {{ hiddenInput('index', site.index) }}
+                                {{ hiddenInput('siteHandle', handle) }}
+                                {{ csrfInput() }}
 
-<div>
-    <h2>{{ 'Clear all data from Elastic App Search'|t('elastic-app-search') }}</h2>
+                                {{ forms.button({
+                                    label: 'Update Schema'|t('elastic-app-search'),
+                                    type: 'submit',
+                                }) }}
+                            </form>
+                            <form method="post" accept-charset="UTF-8">
+                                {{ actionInput('elastic-app-search/utilities/flush') }}
+                                {{ hiddenInput('index', site.index) }}
+                                {{ hiddenInput('siteHandle', handle) }}
+                                {{ csrfInput() }}
 
-    <form id="elastic-app-search-clear" class="utility" method="post" accept-charset="UTF-8">
-        {{ actionInput('elastic-app-search/utilities/clear') }}
-        {{ csrfInput() }}
+                                {{ forms.button({
+                                    label: 'Flush'|t('elastic-app-search'),
+                                    type: 'submit',
+                                }) }}
+                            </form>
+                            <form method="post" accept-charset="UTF-8">
+                                {{ actionInput('elastic-app-search/utilities/delete') }}
+                                {{ hiddenInput('index', site.index) }}
+                                {{ hiddenInput('siteHandle', handle) }}
+                                {{ csrfInput() }}
 
-        {{ forms.submitButton({
-            id: 'clear',
-            label: 'Clear all indexed data'|t('elastic-app-search')
-        }) }}
-    </form>
-</div>
-
-<hr />
-
-<div>
-    <h2>{{ 'Engines' }}</h2>
-
-    <form id="elastic-app-search-engines" class="utility" method="post" accept-charset="UTF-8">
-        {{ actionInput('elastic-app-search/utilities/create-engines') }}
-        {{ csrfInput() }}
-
-        {{ forms.submitButton({
-            id: 'createEngines',
-            label: 'Create engines'|t('elastic-app-search')
-        }) }}
-    </form>
-</div>
+                                {{ forms.button({
+                                    label: 'Delete'|t('elastic-app-search'),
+                                    type: 'submit',
+                                    class: 'caution'
+                                }) }}
+                            </form>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

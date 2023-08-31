@@ -1,11 +1,11 @@
 <?php
 
-namespace GlueAgency\ElasticAppSearch\formatters\fields;
+namespace GlueAgency\ElasticAppSearch\mappers\elements\fields;
 
 use craft\base\Element;
 use craft\base\Field;
 
-class AssetsFieldFormatter implements FieldFormatterInterface
+class AssetsFieldMapper implements FieldMapperInterface
 {
 
     public function format(Element $element, Field $field): mixed
