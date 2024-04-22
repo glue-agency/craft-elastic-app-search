@@ -14,7 +14,6 @@ use craft\helpers\Json;
 use craft\helpers\Queue;
 use craft\services\Utilities;
 use craft\web\twig\variables\CraftVariable;
-use craft\web\UrlManager;
 use craft\web\View;
 use GlueAgency\ElasticAppSearch\assetbundles\ElasticAppSearchAsset;
 use GlueAgency\ElasticAppSearch\assetbundles\SettingsAsset;

@@ -4,6 +4,7 @@ namespace GlueAgency\ElasticAppSearch\services;
 
 use craft\base\Element;
 use craft\elements\Entry;
+use craft\helpers\ElementHelper;
 use craft\helpers\Queue;
 use GlueAgency\ElasticAppSearch\ElasticAppSearch;
 use GlueAgency\ElasticAppSearch\queue\jobs\entry\DeleteEntryJob;
@@ -15,7 +16,13 @@ class IndexingService extends Component
 
     public function index(Element $element): void
     {
-        // @todo check if indexing is turned off
+        if(ElementHelper::isDraftOrRevision($element)) {
+            return;
+        }
+
+        if(empty($element->getDirtyAttributes()) && empty($element->getDirtyFields())) {
+            return;
+        }
 
         if(ElasticAppSearch::getInstance()->settings->shouldBeIndexed($element)) {
             if($element instanceof Entry) {
