@@ -26,9 +26,9 @@ class RemoveAllEntriesJob extends BaseJob
             $page = ElasticAppSearch::getInstance()->documents->all($engineName);
 
             // Only use the first page to keep track of total
-            // amount of pages because of the above behaviour
+            // amount of results because of the above behaviour
             if(! $this->total) {
-                $this->total = $page->meta->page->total_pages;
+                $this->total = $page->meta->page->total_results;
             }
 
             if($page->hasNoResults()) {
@@ -39,7 +39,7 @@ class RemoveAllEntriesJob extends BaseJob
                 return $document->id;
             }, $page->results));
 
-            $this->setProgress($queue, ($page->meta->page->current / $this->total));
+            $this->setProgress($queue, (($this->total - $page->meta->page->total_results) / $this->total) * 100);
         } while($page->hasNext());
     }
 

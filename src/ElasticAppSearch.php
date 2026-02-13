@@ -180,7 +180,7 @@ class ElasticAppSearch extends Plugin
             $event->roots['elastic-app-search'] = $this->getBasePath() . DIRECTORY_SEPARATOR . 'templates';
         });
 
-        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES, function (RegisterComponentTypesEvent $event) {
+        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITIES, function (RegisterComponentTypesEvent $event) {
             $event->types[] = ElasticAppSearchUtility::class;
         });
 

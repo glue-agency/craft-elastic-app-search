@@ -28,7 +28,7 @@ class ElasticAppSearchUtility extends Utility
     {
         return Craft::$app->getView()->renderTemplate('elastic-app-search/utility/index', [
             'sites'        => ElasticAppSearch::getInstance()->settings->sites,
-            'entryTypes'   => Craft::$app->getSections()->getAllEntryTypes(),
+            'entryTypes'   => Craft::$app->getEntries()->getAllEntryTypes(),
             'entryHandles' => ElasticAppSearch::getInstance()->settings->entryHandles,
         ]);
     }

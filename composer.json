@@ -4,8 +4,8 @@
     "type": "craft-plugin",
     "license": "mit",
     "require": {
-        "php": ">=8.0.2",
-        "craftcms/cms": "^4.0.0",
+        "php": "^8.2",
+        "craftcms/cms": "^5.0.0",
         "elastic/enterprise-search": "^8.0",
         "guzzlehttp/guzzle": "^7.2.0",
         "insolita/yii2-array-structure-validator": "^2.0.0"
@@ -24,9 +24,6 @@
     },
     "config": {
         "sort-packages": true,
-        "platform": {
-            "php": "8.0.2"
-        },
         "allow-plugins": {
             "yiisoft/yii2-composer": true,
             "craftcms/plugin-installer": true

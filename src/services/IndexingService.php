@@ -39,7 +39,6 @@ class IndexingService extends Component
         // @todo check if indexing is turned off
 
         if(ElasticAppSearch::getInstance()->settings->shouldBeIndexed($element)) {
-
             if($element instanceof Entry) {
                 Queue::push(new DeleteEntryJob([
                     'entryId'    => $element->id,
