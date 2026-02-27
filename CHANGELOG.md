@@ -1,5 +1,10 @@
 # Release Notes for Elastic App Search
 
+## 5.0.1
+
+- Add plugin icons
+- Fix one more reference to `getSections()`
+
 ## 5.0.0
 
 - Craft 5 support

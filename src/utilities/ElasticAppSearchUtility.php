@@ -19,7 +19,7 @@ class ElasticAppSearchUtility extends Utility
         return 'elastic-app-search';
     }
 
-    public static function iconPath(): ?string
+    public static function icon(): ?string
     {
         return ElasticAppSearch::getInstance()->getBasePath() . DIRECTORY_SEPARATOR . 'icon-mask.svg';
     }

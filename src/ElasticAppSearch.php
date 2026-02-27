@@ -145,7 +145,7 @@ class ElasticAppSearch extends Plugin
         return $view->renderTemplate('elastic-app-search/settings/index', [
             'settings'   => $this->getSettings(),
             'sites'      => Craft::$app->getSites()->getAllSites(),
-            'entryTypes' => Craft::$app->getSections()->getAllEntryTypes(),
+            'entryTypes' => Craft::$app->getEntries()->getAllEntryTypes(),
         ]);
     }
 
